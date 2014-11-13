@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Drawing;
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WebSocketSharp.Server;
 using Timer = System.Windows.Forms.Timer;
@@ -27,6 +27,8 @@ namespace SlackWindowsTray
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
+            ShowWindow(Handle, 0);
+
             UpdateSlackState(SlackNotifierStates.DisconnectedFromExtension);
                 
             _wssv.AddWebSocketService<SlackEndpoint>("/Slack");
@@ -59,7 +61,7 @@ namespace SlackWindowsTray
 
         private void ChangeTrayIcon(SlackNotifierStates state)
         {
-            slackTrayIcon.Icon = new Icon(@"Icons\" + state.ToString() + ".ico");
+            slackTrayIcon.Icon = new Icon(@"Icons\" + state + ".ico", 16, 16);
         }
 
         private void AnimationTimerOnTick(object sender, EventArgs eventArgs)
@@ -87,5 +89,9 @@ namespace SlackWindowsTray
         {
             this.Close();
         }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ShowWindow(IntPtr hWnd, uint nCmdShow);
     }
 }
